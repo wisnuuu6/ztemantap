@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  tim-bts-app:
+    build:
+      context: .
+    container_name: tim-bts-app
+    restart: unless-stopped
+    ports:
+      - "8088:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      SESSION_SECRET: change-me
+      TZ: Asia/Jakarta
+      DB_PATH: /data/app.db
+      TRUST_PROXY: ${TRUST_PROXY:?Set TRUST_PROXY to the proxy source address visible in the app container}
+    volumes:
+      - ./data:/data
+    mem_limit: 512m

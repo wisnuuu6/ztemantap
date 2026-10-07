@@ -1,0 +1,21 @@
+{
+  "name": "tim-bts-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server/index.js",
+    "start": "node src/server/index.js",
+    "migrate": "node src/server/db/migrate.js",
+    "create-admin": "node src/server/create-admin.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^10.0.0",
+    "@fastify/rate-limit": "^10.0.0",
+    "better-sqlite3": "^11.0.0",
+    "dotenv": "^16.0.0",
+    "fastify": "^5.0.0",
+    "uuid": "^10.0.0"
+  }
+}
