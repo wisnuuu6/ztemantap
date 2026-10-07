@@ -55,3 +55,16 @@ Username dan nama diminta dari environment, dan password wajib disediakan dari e
 Saat `NODE_ENV=production`, cookie sesi selalu memakai `Secure`, `HttpOnly`, dan `SameSite=Lax`. Akses aplikasi melalui HTTPS.
 
 Fastify hanya mempercayai alamat proxy yang ditentukan oleh `TRUST_PROXY`, bukan sembarang header `X-Forwarded-For`. Default untuk server non-Docker yang menerima koneksi dari reverse proxy lokal adalah `127.0.0.1,::1`. Untuk Docker Compose, `TRUST_PROXY` wajib diatur ke alamat sumber koneksi dari reverse proxy yang terlihat dari dalam container; gunakan alamat hop yang spesifik dan jangan mempercayai semua alamat (`*`). Dengan demikian `request.ip` memakai IP klien yang diteruskan oleh Tailscale Serve, bukan alamat proxy yang sama untuk semua anggota. Rate limit login membatasi 5 percobaan per menit per IP dan per username.
+
+## Modul 2: Project dan Site Core
+
+Migrasi dijalankan melalui `npm run migrate`. Migrasi menggunakan `CREATE TABLE/INDEX IF NOT EXISTS`, sehingga menambahkan tabel site dan riwayat status tanpa menghapus tabel atau data lama.
+
+API yang tersedia (semua perlu sesi):
+- `/api/projects`: daftar dan CRUD project.
+- `/api/sites`: CRUD site; filter memakai `project_id` dan/atau `status`, pencarian kode/nama memakai `q`.
+- `/api/sites/:id/history`: riwayat perubahan status, termasuk status awal.
+
+ID project dan site dikirim oleh klien sebagai UUID. Pengiriman ulang site dengan ID yang sama mengembalikan record yang sudah ada tanpa membuat salinan. Anggota hanya dapat membaca project/site dan mengubah status atau catatan site; data nilai uang tidak diambil ke respons anggota. Anggota tidak dapat mengubah status site menjadi `Ditagih` atau `Dibayar`. Perubahan status dan catatan disimpan bersama dengan riwayat dalam transaksi SQLite.
+
+Status site yang diterima: `Belum mulai`, `Survey`, `Menunggu izin`, `Siap eksekusi`, `Eksekusi`, `Selesai`, `Dokumen/BAST`, `Ditagih`, `Dibayar`. Tipe site: `tower` atau `rooftop`.
